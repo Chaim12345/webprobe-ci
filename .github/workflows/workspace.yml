@@ -1,0 +1,92 @@
+name: Workspace acceptance
+
+on:
+  pull_request:
+  push:
+    branches: ["parity/**"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: workspace-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_BUILD_RUSTC: rustc
+  CARGO_BUILD_RUSTC_WRAPPER: ""
+  CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER: cc
+  RUSTFLAGS: ""
+  CARGO_TERM_COLOR: never
+  CARGO_BUILD_JOBS: '2'
+  RUSTUP_TOOLCHAIN: '1.100.0'
+
+defaults:
+  run:
+    working-directory: app
+    shell: bash
+
+jobs:
+  workspace:
+    name: workspace
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Record tested commit
+        run: git rev-parse HEAD
+      - name: Install desktop build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes pkg-config libx11-dev libxi-dev libxcursor-dev libxrandr-dev libgl1-mesa-dev
+      - name: Install pinned Rust and checks
+        run: rustup toolchain install 1.100.0 --profile minimal --component clippy,rustfmt
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            app/target
+          key: workspace-${{ runner.os }}-${{ hashFiles('app/Cargo.lock') }}
+          restore-keys: workspace-${{ runner.os }}-
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - name: Execute all default-feature workspace tests, unfiltered
+        run: cargo test --workspace --locked
+
+  jvm-bridge:
+    name: jvm-bridge
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Record tested commit
+        run: git rev-parse HEAD
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: rustup toolchain install 1.100.0 --profile minimal
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            app/target
+          key: jvm-bridge-${{ runner.os }}-${{ hashFiles('app/Cargo.lock') }}
+          restore-keys: jvm-bridge-${{ runner.os }}-
+      - name: Fetch pinned test API, never redistribute it
+        run: |
+          curl --fail --location --retry 3 https://repo.maven.apache.org/maven2/net/portswigger/burp/extensions/montoya-api/2026.7/montoya-api-2026.7.jar -o "$RUNNER_TEMP/montoya-api.jar"
+          printf '%s  %s\n' cb852b7b883290fcc1d21b13d80fa10f5b13a0f57335d710d2b1e5956ecb2a94 "$RUNNER_TEMP/montoya-api.jar" | sha256sum --check -
+      - name: Check JVM gate failure detection
+        run: python3 ../scripts/test-ci-jvm-tests.py
+      - name: Execute existing Montoya stage contracts, reject skips and empty filters
+        env:
+          WEBPROBE_REQUIRE_JAVA: '1'
+          WEBPROBE_BURP_JAR: ${{ runner.temp }}/montoya-api.jar
+        run: python3 ../scripts/ci-jvm-tests.py

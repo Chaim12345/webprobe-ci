@@ -1,0 +1,10 @@
+[package]
+name = "webprobe-report"
+version = "0.1.0"
+edition = "2021"
+
+# Stage A (#37): report generation sits downstream of the engine.
+[dependencies]
+webprobe-core = { path = "../core" }
+serde_json = "1"
+time = "0.3"

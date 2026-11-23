@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [master, "parity/**", "roadmap/**"]
+  pull_request:
+
+# app/.cargo/config.toml pins a machine-local rustc, sccache and ld.lld-22.
+# These overrides make the repo build on a fresh runner. (An empty
+# RUSTFLAGS replaces the linker flags from that file.)
+env:
+  CARGO_BUILD_RUSTC: rustc
+  CARGO_BUILD_RUSTC_WRAPPER: ""
+  RUSTFLAGS: ""
+  CARGO_TERM_COLOR: always
+
+defaults:
+  run:
+    working-directory: app
+
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update stable && rustup default stable && rustup component add clippy
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            app/target
+          key: cargo-${{ runner.os }}-${{ hashFiles('app/Cargo.lock') }}
+          restore-keys: cargo-${{ runner.os }}-
+      # webprobe-core has no UI dependency, so no system libraries are needed.
+      - run: cargo check -p webprobe-core --locked
+      - run: cargo test -p webprobe-core --locked --no-run
+      # Zero-warning policy (issue #33): clippy is blocking.
+      - run: cargo clippy -p webprobe-core --locked --all-targets -- -D warnings
+      # These tests must run in a real JVM, not pass by skipping prerequisites.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Fetch the pinned Montoya test API (not redistributed)
+        run: |
+          curl --fail --location --retry 3 https://repo.maven.apache.org/maven2/net/portswigger/burp/extensions/montoya-api/2026.7/montoya-api-2026.7.jar -o "$RUNNER_TEMP/montoya-api.jar"
+          echo "cb852b7b883290fcc1d21b13d80fa10f5b13a0f57335d710d2b1e5956ecb2a94  $RUNNER_TEMP/montoya-api.jar" | sha256sum --check
+      - name: Montoya public API regressions (required)
+        env:
+          WEBPROBE_REQUIRE_JAVA: '1'
+          WEBPROBE_BURP_JAR: ${{ runner.temp }}/montoya-api.jar
+        run: cargo test -p webprobe-core --locked ext_host::tests::montoya_ -- --test-threads=1
+  bambda:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update stable && rustup default stable
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Fetch pinned Montoya API
+        run: |
+          curl --fail --location --retry 3 https://repo1.maven.org/maven2/net/portswigger/burp/extensions/montoya-api/2026.7/montoya-api-2026.7.jar -o "$RUNNER_TEMP/montoya-api.jar"
+          printf '%s  %s\n' cb852b7b883290fcc1d21b13d80fa10f5b13a0f57335d710d2b1e5956ecb2a94 "$RUNNER_TEMP/montoya-api.jar" | sha256sum --check -
+      - name: Test real Java Bambda compilation and evaluation
+        run: |
+          WEBPROBE_BAMBDA_TEST_JAVA="$JAVA_HOME/bin/java" \
+          WEBPROBE_BAMBDA_TEST_API="$RUNNER_TEMP/montoya-api.jar" \
+          cargo test -p webprobe-core --test bambda --locked -- --ignored --test-threads=2

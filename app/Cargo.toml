@@ -1,0 +1,78 @@
+[package]
+name = "webprobe"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# SIGTERM / SIGINT close the window cleanly (project saved, no crash prompt).
+signal-hook.workspace = true
+webprobe-core = { path = "core" }
+webprobe-report = { path = "report" }
+eframe = { version = "0.37", default-features = false, features = ["glow", "default_fonts", "x11", "clipboard", "links", "accesskit"] }
+egui_glow = "0.37"
+# egui 0.37 only bundles its emoji fonts (NotoEmoji, emoji-icon-font) behind
+# this feature; 0.29 always did, and glyphs such as U+2699 come from them.
+egui = { version = "0.37", default-features = false, features = ["monochrome_emoji_fonts", "experimental"] }
+flate2.workspace = true
+regex.workspace = true
+rand.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+time.workspace = true
+# Burp-clone UI helpers: Render tab text, status-bar memory gauge.
+egui-pop-phosphor = "0.15"
+egui_extras = { version = "0.37", default-features = false }
+html2text = "0.12"
+# Render tab: image responses are shown as pictures, as in Burp.
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif"] }
+sysinfo = { version = "0.32", default-features = false, features = ["system"] }
+# UI automation over MCP (egui-mcp-server): screenshots, clicks, typing.
+# Off by default; build with `--features mcp` to drive the app from an agent.
+egui-mcp-client = { version = "0.0.5", optional = true }
+tokio = { version = "1", features = ["rt-multi-thread", "time", "sync"], optional = true }
+
+[[bin]]
+name = "webprobe-headless"
+path = "src/bin/webprobe-headless.rs"
+
+[features]
+default = []
+mcp = ["dep:egui-mcp-client", "dep:tokio"]
+
+[patch.crates-io]
+egui-mcp-client = { path = "../vendor/egui-mcp-client" }
+
+[profile.release]
+opt-level = 2
+
+# Optimize dependencies, not this crate (measured 2026-11-15 with
+# cargo-nextest): nearly every test builds a net::Shared, which generates a
+# 2048-bit RSA CA key (tls.rs); unoptimized rsa/bigint cost seconds per test.
+[profile.dev.package."*"]
+opt-level = 2
+
+# Keep panic line numbers but write far less DWARF (faster link, smaller
+# target/). Mirrors ~/.cargo/config.toml so the crate is fast on any box.
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.test]
+debug = "line-tables-only"
+
+# The engine is its own crate (core/), with no UI dependency; the desktop app
+# is this package. `cargo build` / `cargo test` here cover both.
+[workspace]
+members = ["core", "support", "report"]
+default-members = [".", "core"]
+
+# Versions shared by webprobe and webprobe-core live here once; members
+# reference them with `workspace = true`. Member-only versions stay in the
+# member manifests.
+[workspace.dependencies]
+signal-hook = "0.3"
+flate2 = "1"
+regex = "1"
+rand = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+time = "0.3"

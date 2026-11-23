@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Marker reflection (example)",
+    "description": "Adds an X-Marker header to requests, reports responses that echo it, drops /blocked requests; shows counters in its own tab. The API v1 walkthrough.",
+    "kind": "process",
+    "command": "python3 -I {dir}/examples/marker_reflection.py",
+    "requires": ["python3"]
+  },
+  {
+    "name": "Security headers review",
+    "description": "Passive review of HTML responses for missing Content-Security-Policy, X-Content-Type-Options and frame protection; one informational issue per host and header, per-host summary tab.",
+    "kind": "process",
+    "command": "python3 -I {dir}/examples/security_headers.py",
+    "requires": ["python3"]
+  },
+  {
+    "name": "Montoya demo (Java)",
+    "description": "A real Burp Montoya extension run in the sidecar JVM: tags requests and responses with headers and drops /admin-drop paths.",
+    "kind": "java",
+    "command": "{dir}/../sidecar/demo-ext/demo-ext.jar",
+    "requires": ["java"]
+  }
+]

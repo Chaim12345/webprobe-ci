@@ -1,0 +1,183 @@
+ASP.NET ViewState without MAC enabled
+ASP.NET debugging enabled
+ASP.NET tracing enabled
+Ajax request header manipulation (DOM-based)
+Ajax request header manipulation (reflected DOM-based)
+Ajax request header manipulation (stored DOM-based)
+BCheck generated issue
+Backup file
+Bambda generated issue
+Base64-encoded data in parameter
+Broken access control
+Browser cross-site scripting filter disabled
+CSS injection (reflected)
+CSS injection (stored)
+Cacheable HTTPS response
+Cleartext submission of password
+Client-side HTTP parameter pollution (reflected)
+Client-side HTTP parameter pollution (stored)
+Client-side JSON injection (DOM-based)
+Client-side JSON injection (reflected DOM-based)
+Client-side JSON injection (stored DOM-based)
+Client-side SQL injection (DOM-based)
+Client-side SQL injection (reflected DOM-based)
+Client-side SQL injection (stored DOM-based)
+Client-side XPath injection (DOM-based)
+Client-side XPath injection (reflected DOM-based)
+Client-side XPath injection (stored DOM-based)
+Client-side desync
+Client-side prototype pollution
+Client-side template injection
+Content security policy: allowlisted script resources
+Content security policy: allows clickjacking
+Content security policy: allows form hijacking
+Content security policy: allows untrusted script execution
+Content security policy: allows untrusted style execution
+Content security policy: malformed syntax
+Content security policy: not enforced
+Content type incorrectly stated
+Content type is not specified
+Cookie manipulation (DOM-based)
+Cookie manipulation (reflected DOM-based)
+Cookie manipulation (stored DOM-based)
+Cookie scoped to parent domain
+Cookie without HttpOnly flag set
+Credit card numbers disclosed
+Cross-domain POST
+Cross-domain Referer leakage
+Cross-domain script include
+Cross-origin resource sharing
+Cross-origin resource sharing: all subdomains trusted
+Cross-origin resource sharing: arbitrary origin trusted
+Cross-origin resource sharing: unencrypted origin trusted
+Cross-site request forgery
+Cross-site scripting (DOM-based)
+Cross-site scripting (reflected DOM-based)
+Cross-site scripting (reflected)
+Cross-site scripting (stored DOM-based)
+Cross-site scripting (stored)
+DOM data manipulation (DOM-based)
+DOM data manipulation (reflected DOM-based)
+DOM data manipulation (stored DOM-based)
+Database connection string disclosed
+Denial of service (DOM-based)
+Denial of service (reflected DOM-based)
+Denial of service (stored DOM-based)
+Directory listing
+Document domain manipulation (DOM-based)
+Document domain manipulation (reflected DOM-based)
+Document domain manipulation (stored DOM-based)
+Duplicate cookies set
+Email addresses disclosed
+Expression Language injection
+Extension generated issue
+External service interaction (DNS)
+External service interaction (HTTP)
+External service interaction (SMTP)
+File path manipulation
+File path traversal
+File upload functionality
+Flash cross-domain policy
+Form action hijacking (reflected)
+Form action hijacking (stored)
+Frameable response (potential Clickjacking)
+GraphQL content type not validated
+GraphQL endpoint discovered
+GraphQL endpoint found
+GraphQL introspection enabled
+GraphQL suggestions enabled
+HTML does not specify charset
+HTML uses unrecognized charset
+HTML5 storage manipulation (DOM-based)
+HTML5 storage manipulation (reflected DOM-based)
+HTML5 storage manipulation (stored DOM-based)
+HTML5 web message manipulation (DOM-based)
+HTML5 web message manipulation (reflected DOM-based)
+HTML5 web message manipulation (stored DOM-based)
+HTTP PUT method is enabled
+HTTP TRACE method is enabled
+HTTP request smuggling
+HTTP response header injection
+Hidden HTTP 2
+Input returned in response (reflected)
+Input returned in response (stored)
+JWT arbitrary jku header supported
+JWT arbitrary x5u header supported
+JWT none algorithm supported
+JWT private key disclosed
+JWT self-signed JWK header supported
+JWT signature not verified
+JWT weak HMAC secret
+JavaScript injection (DOM-based)
+JavaScript injection (reflected DOM-based)
+JavaScript injection (stored DOM-based)
+Json Web Key Set disclosed
+LDAP injection
+Link manipulation (DOM-based)
+Link manipulation (reflected DOM-based)
+Link manipulation (reflected)
+Link manipulation (stored DOM-based)
+Link manipulation (stored)
+Local file path manipulation (DOM-based)
+Local file path manipulation (reflected DOM-based)
+Local file path manipulation (stored DOM-based)
+Long redirection response
+Manually generated issue
+Mixed content
+Multiple content types specified
+OS command injection
+Open redirection (DOM-based)
+Open redirection (reflected DOM-based)
+Open redirection (reflected)
+Open redirection (stored DOM-based)
+Open redirection (stored)
+OpenAPI definition found (active scan check)
+OpenAPI definition found (passive scan check)
+Out-of-band resource load (HTTP)
+PHP code injection
+Password field with autocomplete enabled
+Password returned in URL query string
+Password returned in later response
+Password submitted using GET method
+Password value set in cookie
+Path-relative style sheet import
+Perl code injection
+Private IP addresses disclosed
+Private key disclosed
+Python code injection
+React Server Components remote code execution (React2Shell)
+Referer-dependent response
+Request URL override
+Robots.txt file
+Ruby code injection
+SMTP header injection
+SQL injection
+SQL injection (second order)
+SQL statement in request parameter
+SSI injection
+Serialized object in HTTP message
+Server-side JavaScript code injection
+Server-side template injection
+Session token in URL
+Silverlight cross-domain policy
+Social security numbers disclosed
+Source code disclosure
+Spoofable client IP address
+Strict transport security not enforced
+Suspicious input transformation (reflected)
+Suspicious input transformation (stored)
+TLS certificate
+TLS cookie without secure flag set
+Unencrypted communications
+Unidentified code injection
+User agent-dependent response
+Vulnerable JavaScript dependency
+Web cache deception
+Web cache poisoning
+WebSocket URL poisoning (DOM-based)
+WebSocket URL poisoning (reflected DOM-based)
+WebSocket URL poisoning (stored DOM-based)
+XML entity expansion
+XML external entity injection
+XML injection
+XPath injection

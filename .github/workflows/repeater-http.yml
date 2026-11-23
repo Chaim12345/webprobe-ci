@@ -1,0 +1,46 @@
+name: Repeater Montoya regression
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_BUILD_RUSTC: rustc
+  CARGO_BUILD_RUSTC_WRAPPER: ""
+  RUSTFLAGS: ""
+  CARGO_TERM_COLOR: always
+
+jobs:
+  repeater-http:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: rustup update stable && rustup default stable && rustup component add clippy rustfmt
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            app/target
+          key: repeater-${{ runner.os }}-${{ hashFiles('app/Cargo.lock') }}
+          restore-keys: repeater-${{ runner.os }}-
+      - run: |
+          curl --fail --location --retry 3 https://repo.maven.apache.org/maven2/net/portswigger/burp/extensions/montoya-api/2026.7/montoya-api-2026.7.jar -o "$RUNNER_TEMP/montoya-api.jar"
+          echo "cb852b7b883290fcc1d21b13d80fa10f5b13a0f57335d710d2b1e5956ecb2a94  $RUNNER_TEMP/montoya-api.jar" | sha256sum --check
+      - run: cargo fmt --all -- --check
+      - run: cargo test --locked --no-run
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - name: Real JVM and loopback Repeater HTTP handlers
+        env:
+          WEBPROBE_REQUIRE_JAVA: '1'
+          WEBPROBE_BURP_JAR: ${{ runner.temp }}/montoya-api.jar
+        run: cargo test --locked --bin webprobe repeater_ -- --test-threads=1 --nocapture

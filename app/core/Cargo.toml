@@ -1,0 +1,41 @@
+[package]
+name = "webprobe-core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+webprobe-support = { path = "../support" }
+thiserror = "2"
+brotli = "7"
+flate2.workspace = true
+# RustSec RUSTSEC-2023-0085: same API, fallible dynamic table updates.
+hpack = { package = "hpack-patched", version = "=0.3.0" }
+regex.workspace = true
+# x509-parser: read an imported CA certificate (Proxy settings > Import).
+rcgen = { version = "0.13", features = ["x509-parser"] }
+x509-parser = { version = "0.16", features = ["verify"] }
+rand.workspace = true
+rsa = "0.9"
+serde.workspace = true
+serde_json.workspace = true
+# N-06: history bodies in mapped, unlinked segment files (core/src/body.rs).
+memmap2 = "0.9"
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+time.workspace = true
+webpki-roots = "0.26"
+# interactsh client (Collaborator on a public OAST host): RSA-OAEP-SHA256
+# key unwrap + AES-CTR message decryption (verified live against oast.pro:
+# CFB decrypts only the first block, CTR all of it).
+sha2 = "0.10"
+# JWT checks: RS256 signing with WebProbe's test key (already in Cargo.lock via rustls).
+ring = "0.17"
+aes = "0.8"
+ctr = "0.9"
+base64 = "0.22"
+# Browser-driven crawl: Chrome DevTools Protocol over WebSocket.
+tungstenite = { version = "0.24", default-features = false, features = ["handshake"] }
+yaml_serde = "0.10.7"
+# Async Phase 1 (issue #42): the engine runtime — scanner/intruder probes
+# as futures on a dedicated tokio thread, a semaphore probe pool and
+# queued-task aborts and cooperative blocking-body cancellation (core/src/rt.rs).
+tokio = { version = "1", features = ["rt", "sync", "time", "macros"] }
